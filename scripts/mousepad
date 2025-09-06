@@ -1,0 +1,9 @@
+#!/bin/bash
+
+
+# Enable Tapping
+xinput --set-prop 12 348 1
+xinput --set-prop 12 349 1
+xinput --set-prop 12 330 0.1
+xinput --set-prop 12 331 0.1
+

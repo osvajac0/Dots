@@ -1,0 +1,106 @@
+#!/bin/bash
+
+# DWM Status Bar Script
+# Dependencies: iwconfig (or iw), amixer (or pactl), date
+
+get_wifi() {
+    # Try iwconfig first (wireless-tools)
+    if command -v iwconfig >/dev/null 2>&1; then
+        wifi_name=$(iwconfig 2>/dev/null | grep "ESSID:" | head -n1 | sed 's/.*ESSID:"\([^"]*\)".*/\1/')
+        if [ -n "$wifi_name" ] && [ "$wifi_name" != "off/any" ]; then
+            echo "📶 $wifi_name"
+        else
+            echo "📶 Disconnected"
+        fi
+    # Try iw as alternative
+    elif command -v iw >/dev/null 2>&1; then
+        # Get the first wireless interface
+        interface=$(iw dev | awk '$1=="Interface"{print $2}' | head -n1)
+        if [ -n "$interface" ]; then
+            wifi_name=$(iw dev "$interface" link | grep "SSID:" | sed 's/.*SSID: //')
+            if [ -n "$wifi_name" ]; then
+                echo "📶 $wifi_name"
+            else
+                echo "📶 Disconnected"
+            fi
+        else
+            echo "📶 No WiFi"
+        fi
+    # Try nmcli as last resort
+    elif command -v nmcli >/dev/null 2>&1; then
+        wifi_name=$(nmcli -t -f active,ssid dev wifi | grep '^yes' | cut -d: -f2)
+        if [ -n "$wifi_name" ]; then
+            echo "📶 $wifi_name"
+        else
+            echo "📶 Disconnected"
+        fi
+    else
+        echo "📶 N/A"
+    fi
+}
+
+get_volume() {
+    # Try amixer first (ALSA)
+    if command -v amixer >/dev/null 2>&1; then
+        vol=$(amixer get Master | grep -o '[0-9]*%' | head -n1 | tr -d '%')
+        mute=$(amixer get Master | grep -o '\[off\]')
+        
+        if [ -n "$mute" ]; then
+            echo "🔇 Muted"
+        elif [ "$vol" -eq 0 ]; then
+            echo "🔇 0%"
+        elif [ "$vol" -le 33 ]; then
+            echo "🔈 ${vol}%"
+        elif [ "$vol" -le 66 ]; then
+            echo "🔉 ${vol}%"
+        else
+            echo "🔊 ${vol}%"
+        fi
+    # Try pactl (PulseAudio)
+    elif command -v pactl >/dev/null 2>&1; then
+        vol=$(pactl get-sink-volume @DEFAULT_SINK@ | grep -o '[0-9]*%' | head -n1 | tr -d '%')
+        mute=$(pactl get-sink-mute @DEFAULT_SINK@ | grep -o 'yes')
+        
+        if [ -n "$mute" ]; then
+            echo "🔇 Muted"
+        elif [ "$vol" -eq 0 ]; then
+            echo "🔇 0%"
+        elif [ "$vol" -le 33 ]; then
+            echo "🔈 ${vol}%"
+        elif [ "$vol" -le 66 ]; then
+            echo "🔉 ${vol}%"
+        else
+            echo "🔊 ${vol}%"
+        fi
+    else
+        echo "🔊 N/A"
+    fi
+}
+
+get_datetime() {
+    echo "📅 $(date '+%B, %-d, %A') 🕐 $(date '+%H:%M')"
+}
+
+# Main status function
+update_status() {
+    wifi=$(get_wifi)
+    volume=$(get_volume)
+    datetime=$(get_datetime)
+    
+    # Combine all elements with separators
+    status="$wifi | $volume | $datetime"
+    
+    # Set the status
+    xsetroot -name "$status"
+}
+
+# Run once if called directly
+if [ "${BASH_SOURCE[0]}" == "${0}" ]; then
+    update_status
+fi
+
+# For continuous updating, uncomment the following lines:
+# while true; do
+#     update_status
+#     sleep 5
+# done

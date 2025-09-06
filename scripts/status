@@ -1,0 +1,66 @@
+#!/bin/sh
+
+# Weather location (can be city or zip)
+LOCATION="Duhok"
+
+# Interval
+INTERVAL=60
+
+# Separator
+SEP=" | "
+
+# Function: CPU usage
+get_cpu() {
+    usage=$(top -bn1 | grep "Cpu(s)" | awk '{print 100 - $8}' | cut -d. -f1)
+    echo "${usage}%"
+}
+
+# Function: Memory usage
+get_mem() {
+    used=$(free -h | awk '/Mem:/ {print $3}')
+    echo "$used"
+}
+
+# Function: Temp (Celsius)
+get_temp() {
+    temp=$(sensors | grep -m 1 '°C' | awk '{print $2}' | tr -d '+')
+    echo "$temp"
+}
+
+# Function: Weather (Fahrenheit + icon)
+get_weather() {
+    weather=$(curl -s "wttr.in/${LOCATION}?format=+%t" | tr -d '+')
+
+    # Pick icon (rough mapping)
+    case "$weather" in
+        *Sunny*|*Clear*) icon="☀️" ;;
+        *Cloud*) icon="☁️" ;;
+        *Rain*|*Drizzle*) icon="🌧️" ;;
+        *Snow*) icon="❄️" ;;
+        *Thunder*) icon="⛈️" ;;
+        *) icon="🌡️" ;;
+    esac
+
+    echo "$icon $weather"
+}
+
+# Function: Date and Time
+get_datetime() {
+    date +" %b %d ${SEP} %H:%M"
+}
+
+# Main loop
+while true; do
+    CPU="$(get_cpu)"
+    MEM="$(get_mem)"
+    TEMP="$(get_temp)"
+    WEATHER="$(get_weather)"
+    TIME="$(get_datetime)"
+
+    STATUS="$CPU ${SEP} $MEM ${SEP} $WEATHER ${SEP} $TIME "
+
+    xsetroot -name "$STATUS"
+
+    sleep $INTERVAL
+done
+

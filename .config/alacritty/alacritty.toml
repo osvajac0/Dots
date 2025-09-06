@@ -1,0 +1,101 @@
+[general]
+import = ["~/.cache/wal/colors-alacritty.toml"]
+
+[colors.primary]
+background = "#0a0a0a"
+foreground = "#ffffff"
+
+[colors.cursor]
+text = "#0a0a0a"
+cursor = "#b5b5b5"
+
+[colors.vi_mode_cursor]
+text = "#0A0B0D"
+cursor = "#c1c2c2"
+
+[colors.search.matches]
+foreground = "#0A0B0D"
+background = "#c1c2c2"
+
+[colors.search.focused_match]
+foreground = "CellBackground"
+background = "CellForeground"
+
+[colors.line_indicator]
+foreground = "None"
+background = "None"
+
+[colors.footer_bar]
+foreground = "#565f69"
+background = "#c1c2c2"
+
+[colors.selection]
+text = "CellBackground"
+background = "CellForeground"
+
+[colors.normal]
+black = "#0A0B0D"
+red = "#BC3830"
+green = "#905C37"
+yellow = "#8F704F"
+blue = "#A9794A"
+magenta = "#877B68"
+cyan = "#A78862"
+white = "#c1c2c2"
+
+[colors.bright]
+black = "#565f69"
+red = "#BC3830"
+green = "#905C37"
+yellow = "#8F704F"
+blue = "#A9794A"
+magenta = "#877B68"
+cyan = "#A78862"
+white = "#c1c2c2"
+
+[colors.dim]
+black = "#c1c2c2"
+red = "#BC3830"
+green = "#877B68"
+yellow = "#8F704F"
+blue = "#A9794A"
+magenta = "#905C37"
+cyan = "#A78862"
+white = "#565f69"
+
+[cursor]
+style = "Beam"
+thickness = 0.3
+unfocused_hollow = false
+
+[font]
+size = 7
+
+[font.bold]
+family = "Geist Mono"
+style = "Bold"
+
+[font.bold_italic]
+family = "Geist Mono"
+style = "Bold Italic"
+
+[font.italic]
+family = "Geist Mono"
+style = "Bold Italic"
+
+[font.normal]
+family = "Geist Mono"
+style = "Bold"
+
+[terminal.shell]
+program = "/bin/bash"
+
+[window.padding]
+x = 40
+y = 40
+
+
+[window]
+opacity = 0.95
+
+[terminal]
